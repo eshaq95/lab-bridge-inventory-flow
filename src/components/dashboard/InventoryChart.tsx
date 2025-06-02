@@ -64,9 +64,9 @@ const InventoryChart = () => {
       }));
 
       const stockChartData = [
-        { level: 'Kritisk', count: criticalStock, fill: '#ef4444' },
-        { level: 'Lavt', count: lowStock, fill: '#f97316' },
-        { level: 'Normal', count: normalStock, fill: '#22c55e' }
+        { level: 'Kritisk', count: criticalStock, fill: '#dc2626' },
+        { level: 'Lavt', count: lowStock, fill: '#ea580c' },
+        { level: 'Normal', count: normalStock, fill: '#16a34a' }
       ];
 
       setCategoryData(categoryChartData);
@@ -80,15 +80,15 @@ const InventoryChart = () => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="shadow-sm border-gray-100">
           <CardContent className="pt-6">
-            <div className="animate-pulse h-64 bg-gray-200 rounded"></div>
+            <div className="animate-pulse h-80 bg-gray-100 rounded-lg"></div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-sm border-gray-100">
           <CardContent className="pt-6">
-            <div className="animate-pulse h-64 bg-gray-200 rounded"></div>
+            <div className="animate-pulse h-80 bg-gray-100 rounded-lg"></div>
           </CardContent>
         </Card>
       </div>
@@ -98,64 +98,114 @@ const InventoryChart = () => {
   const chartConfig = {
     antall: {
       label: "Antall",
-      color: "hsl(var(--chart-1))",
+      color: "#3b82f6",
     },
   };
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+          <p className="font-medium text-gray-900">{`${label}`}</p>
+          <p className="text-blue-600">
+            {`Antall: ${payload[0].value}`}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const CustomPieTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+          <p className="font-medium text-gray-900">{payload[0].payload.level}</p>
+          <p style={{ color: payload[0].payload.fill }}>
+            {`Antall: ${payload[0].value}`}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Varer per Kategori</CardTitle>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <Card className="shadow-sm border-gray-100 hover:shadow-md transition-shadow duration-200">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold text-gray-800">Varer per Kategori</CardTitle>
         </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="h-64">
+        <CardContent className="pt-0">
+          <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categoryData}>
-                <CartesianGrid strokeDasharray="3 3" />
+              <BarChart 
+                data={categoryData} 
+                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis 
                   dataKey="kategori" 
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: '#64748b' }}
                   angle={-45}
                   textAnchor="end"
-                  height={60}
+                  height={80}
+                  interval={0}
                 />
-                <YAxis tick={{ fontSize: 12 }} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="antall" fill="var(--color-antall)" />
+                <YAxis 
+                  tick={{ fontSize: 12, fill: '#64748b' }} 
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar 
+                  dataKey="antall" 
+                  fill="#3b82f6"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
-          </ChartContainer>
+          </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Lagerstatus</CardTitle>
+      <Card className="shadow-sm border-gray-100 hover:shadow-md transition-shadow duration-200">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold text-gray-800">Lagerstatus</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-64">
+        <CardContent className="pt-0">
+          <div className="h-80 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={stockLevelData}
                   cx="50%"
                   cy="50%"
-                  labelLine={false}
-                  label={({ level, count, percent }) => 
-                    `${level}: ${count} (${(percent * 100).toFixed(0)}%)`
-                  }
-                  outerRadius={80}
-                  fill="#8884d8"
+                  innerRadius={60}
+                  outerRadius={120}
+                  paddingAngle={3}
                   dataKey="count"
                 >
                   {stockLevelData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip content={<CustomPieTooltip />} />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          <div className="flex justify-center mt-4 space-x-6">
+            {stockLevelData.map((entry, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <div 
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: entry.fill }}
+                ></div>
+                <span className="text-sm text-gray-600">
+                  {entry.level}: {entry.count}
+                </span>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
