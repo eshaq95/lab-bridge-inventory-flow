@@ -9,7 +9,146 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      kategorier: {
+        Row: {
+          beskrivelse: string | null
+          created_at: string | null
+          id: number
+          navn: string
+        }
+        Insert: {
+          beskrivelse?: string | null
+          created_at?: string | null
+          id?: number
+          navn: string
+        }
+        Update: {
+          beskrivelse?: string | null
+          created_at?: string | null
+          id?: number
+          navn?: string
+        }
+        Relationships: []
+      }
+      leverandorer: {
+        Row: {
+          adresse: string | null
+          created_at: string | null
+          epost: string | null
+          id: number
+          kontaktperson: string | null
+          navn: string
+          telefon: string | null
+        }
+        Insert: {
+          adresse?: string | null
+          created_at?: string | null
+          epost?: string | null
+          id?: number
+          kontaktperson?: string | null
+          navn: string
+          telefon?: string | null
+        }
+        Update: {
+          adresse?: string | null
+          created_at?: string | null
+          epost?: string | null
+          id?: number
+          kontaktperson?: string | null
+          navn?: string
+          telefon?: string | null
+        }
+        Relationships: []
+      }
+      transaksjoner: {
+        Row: {
+          antall: number
+          bruker: string | null
+          id: number
+          kommentar: string | null
+          timestamp: string | null
+          type: string
+          vare_id: number | null
+        }
+        Insert: {
+          antall: number
+          bruker?: string | null
+          id?: number
+          kommentar?: string | null
+          timestamp?: string | null
+          type: string
+          vare_id?: number | null
+        }
+        Update: {
+          antall?: number
+          bruker?: string | null
+          id?: number
+          kommentar?: string | null
+          timestamp?: string | null
+          type?: string
+          vare_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaksjoner_vare_id_fkey"
+            columns: ["vare_id"]
+            isOneToOne: false
+            referencedRelation: "varer"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      varer: {
+        Row: {
+          aktiv: boolean | null
+          beholdning: number | null
+          beskrivelse: string | null
+          created_at: string | null
+          enhet: string | null
+          id: number
+          kategori: string | null
+          leverandor: string | null
+          min_niva: number | null
+          navn: string
+          pris: number | null
+          sist_endret: string | null
+          strekkode: string | null
+          utlopsdato: string | null
+        }
+        Insert: {
+          aktiv?: boolean | null
+          beholdning?: number | null
+          beskrivelse?: string | null
+          created_at?: string | null
+          enhet?: string | null
+          id?: number
+          kategori?: string | null
+          leverandor?: string | null
+          min_niva?: number | null
+          navn: string
+          pris?: number | null
+          sist_endret?: string | null
+          strekkode?: string | null
+          utlopsdato?: string | null
+        }
+        Update: {
+          aktiv?: boolean | null
+          beholdning?: number | null
+          beskrivelse?: string | null
+          created_at?: string | null
+          enhet?: string | null
+          id?: number
+          kategori?: string | null
+          leverandor?: string | null
+          min_niva?: number | null
+          navn?: string
+          pris?: number | null
+          sist_endret?: string | null
+          strekkode?: string | null
+          utlopsdato?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
