@@ -33,6 +33,38 @@ export type Database = {
         }
         Relationships: []
       }
+      alerts: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string | null
+          resolved: boolean | null
+          vare_id: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          resolved?: boolean | null
+          vare_id?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          resolved?: boolean | null
+          vare_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_vare_id_fkey"
+            columns: ["vare_id"]
+            isOneToOne: false
+            referencedRelation: "varer"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kategorier: {
         Row: {
           beskrivelse: string | null
