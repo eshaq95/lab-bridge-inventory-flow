@@ -208,7 +208,7 @@ const RecentActivity = () => {
           )}
         </div>
       </CardContent>
-    </Dialog>
+    </Card>
   );
 };
 
