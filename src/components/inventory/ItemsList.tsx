@@ -72,6 +72,15 @@ const ItemsList = () => {
 
       if (error) throw error;
 
+      // Log the deletion activity
+      await supabase
+        .from('aktivitet_logg')
+        .insert({
+          type: 'item_deleted',
+          item_navn: itemName,
+          beskrivelse: `Vare "${itemName}" ble slettet fra lageret`
+        });
+
       // Remove the item from the local state
       setItems(items.filter(item => item.id !== itemId));
       

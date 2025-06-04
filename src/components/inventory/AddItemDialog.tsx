@@ -89,6 +89,15 @@ const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialogProps) 
 
       if (error) throw error;
 
+      // Log the addition activity
+      await supabase
+        .from('aktivitet_logg')
+        .insert({
+          type: 'item_added',
+          item_navn: formData.navn,
+          beskrivelse: `Ny vare "${formData.navn}" ble lagt til i lageret`
+        });
+
       toast({
         title: "Vare lagt til",
         description: "Den nye varen har blitt lagt til i lageret.",
