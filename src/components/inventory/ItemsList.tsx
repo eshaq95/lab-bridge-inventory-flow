@@ -4,8 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, AlertTriangle, Package } from 'lucide-react';
+import { Search, Plus, AlertTriangle, Package, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import AddItemDialog from './AddItemDialog';
 
 interface Item {
@@ -27,6 +39,8 @@ const ItemsList = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchItems();
@@ -45,6 +59,35 @@ const ItemsList = () => {
       console.error('Error fetching items:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteItem = async (itemId: number, itemName: string) => {
+    setDeleteLoading(itemId);
+    try {
+      const { error } = await supabase
+        .from('varer')
+        .delete()
+        .eq('id', itemId);
+
+      if (error) throw error;
+
+      // Remove the item from the local state
+      setItems(items.filter(item => item.id !== itemId));
+      
+      toast({
+        title: "Vare slettet",
+        description: `${itemName} har blitt slettet fra lageret.`,
+      });
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      toast({
+        title: "Feil ved sletting",
+        description: "Kunne ikke slette varen. Prøv igjen.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteLoading(null);
     }
   };
 
@@ -142,6 +185,37 @@ const ItemsList = () => {
                         <span className="ml-1">{new Date(item.utlopsdato).toLocaleDateString('no-NO')}</span>
                       </div>
                     )}
+                  </div>
+                  
+                  <div className="ml-4 flex flex-col gap-2">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          disabled={deleteLoading === item.id}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Slett vare</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Er du sikker på at du vil slette "{item.navn}"? Denne handlingen kan ikke angres.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteItem(item.id, item.navn)}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            Slett
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </div>
