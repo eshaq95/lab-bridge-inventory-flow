@@ -31,10 +31,17 @@ const RecentActivity = () => {
 
   useEffect(() => {
     fetchRecentActivity();
+    
+    // Set up a periodic refresh to catch new activities
+    const interval = setInterval(fetchRecentActivity, 5000); // Refresh every 5 seconds
+    
+    return () => clearInterval(interval);
   }, []);
 
   const fetchRecentActivity = async () => {
     try {
+      console.log('Fetching recent activity...');
+      
       // Fetch recent transactions
       const { data: transactionData, error: transactionError } = await supabase
         .from('transaksjoner')
@@ -46,18 +53,28 @@ const RecentActivity = () => {
           varer (navn, enhet)
         `)
         .order('timestamp', { ascending: false })
-        .limit(3);
+        .limit(5);
 
-      if (transactionError) throw transactionError;
+      if (transactionError) {
+        console.error('Error fetching transactions:', transactionError);
+        throw transactionError;
+      }
+
+      console.log('Fetched transactions:', transactionData);
 
       // Fetch recent activity logs
       const { data: activityData, error: activityError } = await supabase
         .from('aktivitet_logg')
         .select('*')
         .order('timestamp', { ascending: false })
-        .limit(3);
+        .limit(5);
 
-      if (activityError) throw activityError;
+      if (activityError) {
+        console.error('Error fetching activity logs:', activityError);
+        throw activityError;
+      }
+
+      console.log('Fetched activity logs:', activityData);
 
       setRecentTransactions(transactionData || []);
       setActivityLogs(activityData || []);
@@ -85,6 +102,8 @@ const RecentActivity = () => {
       timestamp: log.timestamp
     }))
   ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
+
+  console.log('Combined activities:', allActivities);
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -189,7 +208,7 @@ const RecentActivity = () => {
           )}
         </div>
       </CardContent>
-    </Card>
+    </Dialog>
   );
 };
 

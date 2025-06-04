@@ -72,7 +72,9 @@ const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialogProps) 
     setLoading(true);
 
     try {
-      const { error } = await supabase
+      console.log('Starting item insertion with data:', formData);
+
+      const { data: newItem, error: insertError } = await supabase
         .from('varer')
         .insert({
           navn: formData.navn,
@@ -85,18 +87,38 @@ const AddItemDialog = ({ open, onOpenChange, onItemAdded }: AddItemDialogProps) 
           enhet: formData.enhet,
           beskrivelse: formData.beskrivelse || null,
           strekkode: formData.strekkode || null
-        });
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (insertError) {
+        console.error('Error inserting item:', insertError);
+        throw insertError;
+      }
 
-      // Log the addition activity
-      await supabase
+      console.log('Item inserted successfully:', newItem);
+
+      // Log the addition activity with explicit timestamp
+      const activityLogData = {
+        type: 'item_added',
+        item_navn: formData.navn,
+        beskrivelse: `Ny vare "${formData.navn}" ble lagt til i lageret`,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('Inserting activity log with data:', activityLogData);
+
+      const { error: logError } = await supabase
         .from('aktivitet_logg')
-        .insert({
-          type: 'item_added',
-          item_navn: formData.navn,
-          beskrivelse: `Ny vare "${formData.navn}" ble lagt til i lageret`
-        });
+        .insert(activityLogData);
+
+      if (logError) {
+        console.error('Error logging activity:', logError);
+        // Don't throw here - we still want to show success for the item creation
+        console.warn('Activity logging failed, but item was created successfully');
+      } else {
+        console.log('Activity logged successfully');
+      }
 
       toast({
         title: "Vare lagt til",
