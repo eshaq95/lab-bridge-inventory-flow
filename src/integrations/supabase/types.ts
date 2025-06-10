@@ -210,7 +210,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      fn_register_tx: {
+        Args: { p_strekkode: string; p_qty: number; p_comment?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

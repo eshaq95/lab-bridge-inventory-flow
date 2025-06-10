@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, AlertTriangle, Package, Trash2 } from 'lucide-react';
+import { Search, Plus, AlertTriangle, Package, Trash2, QrCode } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -19,6 +19,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import AddItemDialog from './AddItemDialog';
+import BarcodeGenerator from '../barcode/BarcodeGenerator';
 
 interface Item {
   id: number;
@@ -32,6 +33,7 @@ interface Item {
   enhet: string | null;
   beskrivelse: string | null;
   aktiv: boolean | null;
+  strekkode: string | null;
 }
 
 const ItemsList = () => {
@@ -103,7 +105,8 @@ const ItemsList = () => {
   const filteredItems = items.filter(item =>
     item.navn.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (item.kategori && item.kategori.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (item.leverandor && item.leverandor.toLowerCase().includes(searchTerm.toLowerCase()))
+    (item.leverandor && item.leverandor.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (item.strekkode && item.strekkode.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const isLowStock = (item: Item) => {
@@ -133,7 +136,7 @@ const ItemsList = () => {
           <div className="flex items-center space-x-2 mb-4">
             <Search className="h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Søk etter varer..."
+              placeholder="Søk etter varer, kategorier, leverandører eller strekkoder..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1"
@@ -161,13 +164,19 @@ const ItemsList = () => {
                       {item.kategori && (
                         <Badge variant="secondary">{item.kategori}</Badge>
                       )}
+                      {item.strekkode && (
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <QrCode className="h-3 w-3" />
+                          {item.strekkode}
+                        </Badge>
+                      )}
                     </div>
                     
                     {item.beskrivelse && (
                       <p className="text-gray-600 mb-2">{item.beskrivelse}</p>
                     )}
                     
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-3">
                       <div>
                         <span className="font-medium text-gray-700">Beholdning:</span>
                         <p className={`${isLowStock(item) ? 'text-red-600 font-bold' : ''}`}>
@@ -187,6 +196,15 @@ const ItemsList = () => {
                         <p>{item.pris ? `${item.pris} kr` : 'Ikke angitt'}</p>
                       </div>
                     </div>
+
+                    {item.strekkode && (
+                      <div className="mb-2">
+                        <span className="font-medium text-gray-700 text-sm">Strekkode:</span>
+                        <div className="mt-1">
+                          <BarcodeGenerator code={item.strekkode} width={150} height={30} />
+                        </div>
+                      </div>
+                    )}
                     
                     {item.utlopsdato && (
                       <div className="mt-2 text-sm">

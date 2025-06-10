@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Package, Users, Building2, Activity } from 'lucide-react';
+import { ArrowLeft, Package, Users, Building2, Activity, Scan } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import StatsCards from './dashboard/StatsCards';
 import RecentActivity from './dashboard/RecentActivity';
@@ -12,6 +12,7 @@ import ItemsList from './inventory/ItemsList';
 import CategoriesList from './inventory/CategoriesList';
 import SuppliersList from './inventory/SuppliersList';
 import TransactionsList from './inventory/TransactionsList';
+import BarcodeManagement from './barcode/BarcodeManagement';
 
 const InventoryDashboard = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const InventoryDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
             Oversikt
@@ -43,6 +44,10 @@ const InventoryDashboard = () => {
           <TabsTrigger value="items" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Varer
+          </TabsTrigger>
+          <TabsTrigger value="barcode" className="flex items-center gap-2">
+            <Scan className="h-4 w-4" />
+            Strekkode
           </TabsTrigger>
           <TabsTrigger value="categories" className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
@@ -71,6 +76,10 @@ const InventoryDashboard = () => {
 
         <TabsContent value="items">
           <ItemsList />
+        </TabsContent>
+
+        <TabsContent value="barcode">
+          <BarcodeManagement />
         </TabsContent>
 
         <TabsContent value="categories">
