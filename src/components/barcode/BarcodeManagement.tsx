@@ -1,98 +1,65 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Scan, Printer, Package } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { QrCode, Scan, Printer } from 'lucide-react';
 import BarcodeScanner from './BarcodeScanner';
 import BarcodeLabelPrinter from './BarcodeLabelPrinter';
+import BarcodeGenerator from './BarcodeGenerator';
 
 const BarcodeManagement = () => {
-  const [showPrintDialog, setShowPrintDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState('scan');
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Strekkode System</h2>
-        <Button 
-          onClick={() => setShowPrintDialog(true)}
-          className="flex items-center gap-2"
-        >
-          <Printer className="h-4 w-4" />
-          Skriv ut etiketter
-        </Button>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <QrCode className="h-5 w-5" />
+            Strekkode Administrasjon
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="scan" className="flex items-center gap-2">
+                <Scan className="h-4 w-4" />
+                Skann
+              </TabsTrigger>
+              <TabsTrigger value="print" className="flex items-center gap-2">
+                <Printer className="h-4 w-4" />
+                Skriv ut etiketter
+              </TabsTrigger>
+              <TabsTrigger value="generate" className="flex items-center gap-2">
+                <QrCode className="h-4 w-4" />
+                Generer strekkoder
+              </TabsTrigger>
+            </TabsList>
 
-      <Tabs defaultValue="scanner" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="scanner" className="flex items-center gap-2">
-            <Scan className="h-4 w-4" />
-            Skanner
-          </TabsTrigger>
-          <TabsTrigger value="info" className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
-            Informasjon
-          </TabsTrigger>
-        </TabsList>
+            <TabsContent value="scan" className="mt-6">
+              <BarcodeScanner />
+            </TabsContent>
 
-        <TabsContent value="scanner">
-          <BarcodeScanner />
-        </TabsContent>
+            <TabsContent value="print" className="mt-6">
+              <BarcodeLabelPrinter />
+            </TabsContent>
 
-        <TabsContent value="info">
-          <Card>
-            <CardHeader>
-              <CardTitle>Strekkode System Informasjon</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold mb-2">Automatisk generering</h3>
-                  <ul className="text-sm space-y-1 text-gray-600">
-                    <li>• Nye varer får automatisk strekkode (LAB-XXXXX)</li>
-                    <li>• Eksisterende varer vil få koder når de oppdateres</li>
-                    <li>• Koder er unike og kan ikke dupliseres</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2">Støttede skannere</h3>
-                  <ul className="text-sm space-y-1 text-gray-600">
-                    <li>• USB strekkode-skannere (anbefalt)</li>
-                    <li>• Kamera-basert skanning</li>
-                    <li>• Manuell innskriving av koder</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-2">Funksjoner</h3>
-                  <ul className="text-sm space-y-1 text-gray-600">
-                    <li>• Registrer inn/ut transaksjoner</li>
-                    <li>• Skriv ut etiketter for varer</li>
-                    <li>• Automatisk loggføring av aktivitet</li>
-                    <li>• Sanntids oppdatering av beholdning</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-2">Tips for bruk</h3>
-                  <ul className="text-sm space-y-1 text-gray-600">
-                    <li>• Skriv ut etiketter og fest på varer/hyller</li>
-                    <li>• Bruk USB-skanner for raskest registrering</li>
-                    <li>• Legg til kommentarer for bedre sporing</li>
-                    <li>• Kontroller beholdning etter skanning</li>
-                  </ul>
+            <TabsContent value="generate" className="mt-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Generer strekkode</h3>
+                <p className="text-gray-600">
+                  Alle varer får automatisk generert strekkoder når de opprettes. 
+                  Du kan se strekkodene i vareoversikten.
+                </p>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium mb-2">Eksempel strekkode:</h4>
+                  <BarcodeGenerator code="LAB-00001" />
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      <BarcodeLabelPrinter 
-        open={showPrintDialog} 
-        onOpenChange={setShowPrintDialog} 
-      />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };
