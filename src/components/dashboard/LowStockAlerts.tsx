@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -55,18 +54,7 @@ const LowStockAlerts = () => {
     try {
       console.log('Checking for low stock items...');
       
-      // Find items where stock is at or below minimum level
-      const { data: lowStockItems, error: itemsError } = await supabase
-        .from('varer')
-        .select('id, navn, beholdning, min_niva, enhet')
-        .lte('beholdning', supabase.rpc('min_niva'));
-
-      if (itemsError) {
-        console.error('Error checking low stock items:', itemsError);
-        return;
-      }
-
-      // Alternative query to find low stock items
+      // Fetch all items and filter for low stock in JavaScript
       const { data: allItems, error: allItemsError } = await supabase
         .from('varer')
         .select('id, navn, beholdning, min_niva, enhet');
