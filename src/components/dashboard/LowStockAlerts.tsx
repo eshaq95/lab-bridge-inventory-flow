@@ -28,6 +28,7 @@ const LowStockAlerts = () => {
 
   useEffect(() => {
     fetchAlerts();
+    checkAndCreateAlerts();
     
     // Set up real-time subscription for new alerts
     const subscription = supabase
@@ -49,6 +50,67 @@ const LowStockAlerts = () => {
       subscription.unsubscribe();
     };
   }, []);
+
+  const checkAndCreateAlerts = async () => {
+    try {
+      console.log('Checking for low stock items...');
+      
+      // Find items where stock is at or below minimum level
+      const { data: lowStockItems, error: itemsError } = await supabase
+        .from('varer')
+        .select('id, navn, beholdning, min_niva, enhet')
+        .lte('beholdning', supabase.rpc('min_niva'));
+
+      if (itemsError) {
+        console.error('Error checking low stock items:', itemsError);
+        return;
+      }
+
+      // Alternative query to find low stock items
+      const { data: allItems, error: allItemsError } = await supabase
+        .from('varer')
+        .select('id, navn, beholdning, min_niva, enhet');
+
+      if (allItemsError) {
+        console.error('Error fetching all items:', allItemsError);
+        return;
+      }
+
+      const actualLowStockItems = (allItems || []).filter(item => 
+        (item.beholdning || 0) <= (item.min_niva || 0)
+      );
+
+      console.log('Low stock items found:', actualLowStockItems);
+
+      // Create alerts for items that don't already have unresolved alerts
+      for (const item of actualLowStockItems) {
+        const { data: existingAlert } = await supabase
+          .from('alerts')
+          .select('id')
+          .eq('vare_id', item.id)
+          .eq('resolved', false)
+          .maybeSingle();
+
+        if (!existingAlert) {
+          console.log(`Creating alert for low stock item: ${item.navn}`);
+          
+          const { error: alertError } = await supabase
+            .from('alerts')
+            .insert({
+              vare_id: item.id,
+              message: `Beholdning er under minimum for vare: ${item.navn}`,
+              resolved: false
+            });
+
+          if (alertError) {
+            console.error('Error creating alert:', alertError);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error in checkAndCreateAlerts:', error);
+    }
+  };
 
   const fetchAlerts = async () => {
     try {
