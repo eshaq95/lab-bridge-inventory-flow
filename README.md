@@ -34,7 +34,19 @@ Deployed using [Lovable](https://lovable.dev/projects/23b68129-3f38-4add-a3d6-58
 
 ## Project Access
 
-**Live App:** [Open in Lovable](https://lovable.dev/projects/23b68129-3f38-4add-a3d6-581417fdb8dc)
+- **Live App:** [Open in Lovable](https://lovable.dev/projects/23b68129-3f38-4add-a3d6-581417fdb8dc)
+- **GitHub Repo:** _Private during development_
+
+---
+
+## 📊 Dashboard Preview
+
+This project integrates with **Tableau** to visualize inventory status, low stock alerts, and supplier breakdowns in real time.
+
+> Example: "Low Stock", "Stock by Category", "Recent Transactions"
+
+![Tableau Dashboard Screenshot](https://github.com/eshaq95/LabInventoryBridge/assets/your-screenshot-id-here)  
+*(Replace with actual screenshot URL or path)*
 
 ---
 
@@ -58,3 +70,25 @@ npm install
 
 # Start local dev server
 npm run dev
+```
+
+Requires Node.js & npm. [Install via nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+### Option 3: GitHub Codespaces
+
+- Click "Code" > "Codespaces" > "New codespace"
+- Develop inside your browser with full dev environment
+
+---
+
+## Deployment & Domain
+
+- **Deploy:** Use “Share → Publish” inside Lovable UI
+- **Custom Domain:** Go to Project > Settings > Domains  
+  [How to configure](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+---
+
+## License
+
+MIT – open source and extendable for lab-scale or commercial use.
